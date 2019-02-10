@@ -1,3 +1,20 @@
+
+## To-do:
+/*
+* card styles https://www.w3schools.com/howto/howto_css_cards.asp
+* Align cells into rows and columns
+* Find images
+* Register event listeners
+* --click
+* --match
+* --nomatch
+* Game controls
+* Create image array
+* Randomize values/images
+* Animations
+*/
+
+
 This coding challenge is all about **understanding javascript and coding without the help of a library or tools**. It is very easy to get caught up in all of the trendy libraries and tools that allow you to build front end applications. However, by focusing on just a library, you are letting yourself be at the mercy of trends that constantly change. Instead, if you are able to understand the core concepts of javascript, then you aren't as influenced by trends and you can constantly adapt since the underlying language of the web doesn't change very often (these libraries are all written in Javascript afterall!) In this challenge, you are only allowed to use JavaScript to build a game!
 
 ## What is the Challenge?
