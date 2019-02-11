@@ -23,6 +23,7 @@ body {}
     
 }
 .card:hover{
+    /* ToDo: style this. */
     background-color: green;
     border: blue;
 }
