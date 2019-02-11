@@ -3,7 +3,9 @@
 /*
 * card styles https://www.w3schools.com/howto/howto_css_cards.asp
 * Align cells into rows and columns
-* Find images
+* Find images (front, back)
+* Game play
+* * init, randomize, reset counters.
 * Register event listeners
 * --click
 * --match

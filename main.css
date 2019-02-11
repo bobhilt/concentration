@@ -1,5 +1,8 @@
 body {}
+
 .container{}
+
+/* Three image containers (use 25% for four, and 50% for two, etc) */
 .column {
     float: left;
     width: 30%;
@@ -10,13 +13,24 @@ body {}
     content: "";
     clear: both;
     display: table;
-  }.card {
+}
+.card {
     background-color: #000;
-    border: 2px;
+    border: 2px solid red;
     color: #fff;
     height: 150px; 
-    margin: 20px;
+    /* margin: 5px; */
+    
 }
-
-/* Three image containers (use 25% for four, and 50% for two, etc) */
-  
+.card:hover{
+    background-color: green;
+    border: blue;
+}
+.bottomNav{
+    background-color: #fff;
+    font-size: .75rem;
+    overflow: hidden;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+}
