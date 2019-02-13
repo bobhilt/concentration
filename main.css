@@ -2,6 +2,10 @@ body {}
 
 .container{}
 
+#turnTimer{}
+#moveCounter{}
+#gameControl{}
+
 /* Three image containers (use 25% for four, and 50% for two, etc) */
 .column {
     float: left;
@@ -26,6 +30,10 @@ body {}
     /* ToDo: style this. */
     background-color: green;
     border: blue;
+}
+.flashCorrect{
+    border: green;
+    border-style: double
 }
 .bottomNav{
     background-color: #fff;
