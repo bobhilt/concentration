@@ -1,10 +1,21 @@
 body {}
 
 .container{}
+.controlBar{
+    padding: 20px;
+}
 
 #turnTimer{}
 #moveCounter{}
 #gameControl{}
+#gameOver.hidden{
+    display: none;
+}
+#gameOver.showing{
+    color: red;
+    font-size: 1rem;
+    display: inline-block;
+}
 
 /* Three image containers (use 25% for four, and 50% for two, etc) */
 .column {

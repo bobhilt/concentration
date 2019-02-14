@@ -1,41 +1,47 @@
 var cards = document.getElementsByClassName('card');
-const card_backs = ['a', 'b', 'b', 'a'];
-const cardFaceUp = [0,0,0,0]; 
-var completedCards = 0;
+const cardBacks = ['a', 'b', 'b', 'a'];
+const game = {
+    cardFaceUp: [0,0,0,0],
+    completeCards: 0,
+    elapsedSeconds: 0,
+    selections: [],
+    turnCount: 0,
+    timer: null,
+    elements: {
+        moveCounter: document.getElementById('moveCounter'),  
+        gameControlButton: document.getElementById('gameControl'),
+        gameOver: document.getElementById('gameOver'),
+        timerMinutes: document.getElementById('minutes'),
+        timerSeconds: document.getElementById('seconds')
+    }
+}
 
-const selections = []; // selected card divs from DOM.
-var elapsedSeconds = 0;
-var turnCount = 0;
-const moveCounter = document.getElementById('moveCounter');
-const gameControlButton = document.getElementById('gameControl');
-var timer;
-const timerMinutes = document.getElementById('minutes');
-const timerSeconds = document.getElementById('seconds');
+game.elements.gameControlButton.addEventListener('click', gameControlClickHandler);
 
 function startTimer(){
-    timer = setInterval(updateTimer, 1000);
+    game.timer = setInterval(updateTimer, 1000);
 }
 
 function stopTimer(){
-    if (timer){
-        clearInterval(timer);
+    if (game.timer){
+        clearInterval(game.timer);
     }
 }
 
 function resetTimer() {
     stopTimer();
-    elapsedSeconds = 0;
-    timerMinutes.innerHTML = '00';
-    timerSeconds.innerHTML = '00';
+    game.elapsedSeconds = 0;
+    game.elements.timerMinutes.innerHTML = '00';
+    game.elements.timerSeconds.innerHTML = '00';
   }
   
 function updateTimer() {
-    elapsedSeconds++;
-    let seconds = (elapsedSeconds % 60).toFixed(0);
-    seconds = ('00' + seconds).slice(-2);
-    minutes = Math.floor(elapsedSeconds / 60)
-    timerMinutes.innerHTML = minutes;
-    timerSeconds.innerHTML = seconds;
+    game.elapsedSeconds++;
+    let seconds = (game.elapsedSeconds % 60).toFixed(0);
+    seconds = ('00' + seconds).slice(-2); // left-pad 0s
+    minutes = Math.floor(game.elapsedSeconds / 60)
+    game.elements.timerMinutes.innerHTML = minutes;
+    game.elements.timerSeconds.innerHTML = seconds;
 }
 
 function getCardIndex(card) {
@@ -43,18 +49,18 @@ function getCardIndex(card) {
 }
 
 function isFaceUp(card){
-    return(cardFaceUp[getCardIndex(card)]);
+    return(game.cardFaceUp[getCardIndex(card)]);
 }
 function turnFaceDown(card){
     // todo: Get back image
     card.innerHTML = card.id;
-    cardFaceUp[getCardIndex(card)] = 0;
+    game.cardFaceUp[getCardIndex(card)] = 0;
 }
 function turnFaceUp(card){
     // ToDo: Front images
     let cardIndex = getCardIndex(card);
-    card.innerHTML = card_backs[cardIndex];
-    cardFaceUp[cardIndex] = 1;
+    card.innerHTML = cardBacks[cardIndex];
+    game.cardFaceUp[cardIndex] = 1;
 }
 function toggleCard(card) {
     if (isFaceUp(card)) {
@@ -70,17 +76,17 @@ function setCardCompleted(card) {
 }
 
 function isMatch() {
-    let card0 = selections[0];
-    let card1 = selections[1];
+    let card0 = game.selections[0];
+    let card1 = game.selections[1];
     let card0Index = getCardIndex(card0);
     let card1Index = getCardIndex(card1);
-    return card_backs[card0Index] === card_backs[card1Index];
+    return cardBacks[card0Index] === cardBacks[card1Index];
 }
-function addClass(el, className) {
-    if (el.classList)
-  el.classList.add(className);
+function addClass(element, className) {
+    if (element.classList)
+  element.classList.add(className);
 else
-  el.className += ' ' + className;
+  element.className += ' ' + className;
 }
 
 function removeClass(element, className) {
@@ -91,20 +97,26 @@ else
 }
 
 function gameWon(){
-    let message = "Congratulations! You won in " +
-    turnCount + " moves and " +
-    elapsedSeconds + " seconds.";
-    alert(message);
+    let message = "Congratulations! You won with " +
+    game.turnCount + " moves in " +
+    game.elapsedSeconds + " seconds.";
+    game.elements.gameOver.innerHTML = message;
+    addClass(game.elements.gameOver, 'showing')
+    setTimeout(() => {
+        addClass(game.elements.gameOver, 'hidden');
+        removeClass(game.elements.gameOver, 'showing');
+    }, 2000);
+
     stopTimer();
-    gameControlButton.innerHTML = "New Game";
+    game.elements.gameControlButton.innerHTML = "New Game";
 }
 
 function resolveTurn(isCorrect) {
     const longPause = 1000; // ms
     const shortPause = 500;
 
-    let card0 = selections[0];
-    let card1 = selections[1];
+    let card0 = game.selections[0];
+    let card1 = game.selections[1];
 
     if (isCorrect) {
         completedCards += 2;
@@ -115,7 +127,6 @@ function resolveTurn(isCorrect) {
         }, shortPause);
         if (completedCards === cards.length){
             gameWon();
-            
         }
     } else {
         // pause for user to see, then reset.
@@ -126,18 +137,18 @@ function resolveTurn(isCorrect) {
             toggleCard(card1);
         }, longPause);
     }
-    selections.pop();
-    selections.pop();
+    game.selections.pop();
+    game.selections.pop();
 }
 
 function cardClickEventHandler() {
-    if (turnCount === 0) {
+    if (game.turnCount === 0) {
         startTimer();
     }
     incrementMoveCounter();
-    selections.push(this);
+    game.selections.push(this);
     toggleCard(this);
-    if (selections.length == 2) {
+    if (game.selections.length == 2) {
         resolveTurn(isMatch()); 
     } 
 };
@@ -161,21 +172,32 @@ function gameControlClickHandler() {
 }
 
 function setMoveCounter() {
-    moveCounter.innerHTML = String(turnCount);
+    moveCounter.innerHTML = String(game.turnCount);
 }
 
 function incrementMoveCounter() {
-    turnCount++;
+    game.turnCount++;
     setMoveCounter();
 }
 
 function resetMoveCounter() {
-    turnCount = 0;
+    game.turnCount = 0;
     setMoveCounter();
 }
 
 function shuffleCards() {
+    var m = cardBacks.length, t, i;
+    // While there remain elements to shuffle…
+    while (m) {
 
+        // Pick a remaining element…
+        i = Math.floor(Math.random() * m--);
+
+        // And swap it with the current element.
+        t = cardBacks[m];
+        cardBacks[m] = cardBacks[i];
+        cardBacks[i] = t;
+    }      
 }
 
 function initGame() {
@@ -192,5 +214,4 @@ function initGame() {
     });    
 }
 
-gameControlButton.addEventListener('click', gameControlClickHandler);
 
