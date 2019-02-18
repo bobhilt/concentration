@@ -2,17 +2,16 @@
 ## To-do:
 /*
 * card styles https://www.w3schools.com/howto/howto_css_cards.asp
-* Align cells into rows and columns
-* Find images (front, back)
-* Game play
-* * init, randomize, reset counters.
-* Register event listeners
-* --click
-* --match
-* --nomatch
-* Game controls
+* ~~Align cells into rows and columns~~
+* ~~Find images (front, back)~~
+* ~~Game play~~
+* ~~init, randomize, reset counters.~~
+* ~~Register event listeners~~
+* ~~--click~~
+* ~~Game control button click~~
+* ~~Game controls~~
 * Create image array
-* Randomize values/images
+* ~~Randomize values/images~~
 * Animations
 */
 

@@ -8,10 +8,11 @@ body {}
 #turnTimer{}
 #moveCounter{}
 #gameControl{}
-#gameOver.hidden{
+.hidden{
     display: none;
 }
-#gameOver.showing{
+
+.showing{
     color: red;
     font-size: 1rem;
     display: inline-block;
@@ -19,9 +20,11 @@ body {}
 
 /* Three image containers (use 25% for four, and 50% for two, etc) */
 .column {
+    
     float: left;
     width: 30%;
     padding: 5px;
+    vertical-align: middle;
   }
 /* Clear floats after image containers */
   .row::after {
@@ -33,7 +36,9 @@ body {}
     background-color: #000;
     border: 2px solid red;
     color: #fff;
+    font-size: 8rem;
     height: 150px; 
+    text-align: center;
     /* margin: 5px; */
     
 }
