@@ -12,25 +12,36 @@
         <!-- work out concept with 2x2 grid -->
         <!-- set id number to card-<row><col> -->
         <div class="controlBar">
-                <span class="turnTimer">Time: <label id="minutes">00</label>:<label id="seconds">00</label></span>
-                <span class="moves">Moves: <label id="moveCounter">0 </label></span>
-                <span><button id="gameControl" type="button">Start Game</button></span>
-            </div>
-        <div id="gameOver"></div>
-        <div class="row">
-            <div class="column card" id="card-000">
-                &#x1F3B4 
-            </div>
-            <div class="column card" id="card-001">
-                &#x1F3B4
-            </div>
+            <span class="turnTimer">Time: <label id="minutes">00</label>:<label id="seconds">00</label></span>
+            <span class="moves">Moves: <label id="moveCounter">0 </label></span>
+            <span>
+                <label for="gridSize">Grid Size:</label>
+                <select id="gridSize">
+                    <option value="sm">Small</option>
+                    <option value="med" selected>Medium</option>
+                    <option value="lg">Large</option>
+                    <option value="xl">Extra Large</option>
+                </select>
+            </span>
+                
         </div>
-        <div class="row">
-            <div class="column card" id="card-002">
-                &#x1F3B4
+        <div id="gameOver" class="popup popuptext"></div>
+        <div class="container" id="cardArray">
+            <div class="row">
+                <div class="column card" id="card-000">
+                    &#x1F3B4 
+                </div>
+                <div class="column card" id="card-001">
+                    &#x1F3B4
+                </div>
             </div>
-            <div class="column card" id="card-003">
-                &#x1F3B4
+            <div class="row">
+                <div class="column card" id="card-002">
+                    &#x1F3B4
+                </div>
+                <div class="column card" id="card-003">
+                    &#x1F3B4
+                </div>
             </div>
         </div>
     </div>

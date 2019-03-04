@@ -1,25 +1,64 @@
-// namespace
-var app = {  
-    cards: document.getElementsByClassName('card'),
+const app = {  
     emoji: null,
-    cardFronts: ['','','',''],
     cardBack: "🎴", // '\u1F3b4' "flower playing cards",
     checkMark: '\u2705',
+    defaultGameSize: 'med',
+    sizeValues: {
+        'sm': {rows: 4, cols: 4},
+        'med': {rows: 6, cols: 4},
+        'lg': {rows: 6, cols: 6},
+        'xl': {rows: 8, cols: 8},
+    },
 }
+
 const game = {
-    cardFaceUp: [0,0,0,0],
+    gameSize: 'med',
+    cards: [], // card objects in dom
+    cardFaceUp: [], // map of card-face states
+    cardFronts: [], // card images
     completeCards: 0,
     elapsedSeconds: 0,
     selections: [],
     turnCount: 0,
     timer: null,
+    rows: 0,
+    cols: 0,
     elements: {
         moveCounter: document.getElementById('moveCounter'),  
-        gameControlButton: document.getElementById('gameControl'),
-        gameOver: document.getElementById('gameOver'),
+        gridSize: document.getElementById('gridSize'),
+        popup: document.getElementById('gameOver'),
         timerMinutes: document.getElementById('minutes'),
         timerSeconds: document.getElementById('seconds')
+    },
+}
+
+function buildCardHTML(row, col) {
+    let cardRow = ('00' + row).slice(-2); // left-pad 0s 
+    let cardCol = ('00' + col).slice(-2);
+    let cardHTML = '<div class="column card" id="card-' + cardRow + cardCol + '">' + app.cardBack + '</div>';
+    return cardHTML;
+}
+function buildCardGridRow(rowNum, rows, cols){
+    let rowHTML = '<div class="row">';
+    for (let col = 0; col < cols; col++) {
+        rowHTML += buildCardHTML(rowNum, col);
     }
+    rowHTML += '</div>';
+    return rowHTML;
+}
+
+function buildCardGrid(rows, cols) {
+    let html = '';
+    for (let i = 0; i < rows; i++) {
+        html += buildCardGridRow(i, rows, cols);
+    }
+    return html;
+}
+function addCards(rows, cols) {
+    // dynamic card array size. Must be even number of cards
+    let parentContainer = document.getElementById("cardArray");
+    parentContainer.className = "container rows_" + rows + " cols_" + cols
+    parentContainer.innerHTML = buildCardGrid(rows,cols);
 }
 
 function startTimer(){
@@ -49,7 +88,11 @@ function updateTimer() {
 }
 
 function getCardIndex(card) {
-    return Number(card.id.slice(-3));
+    // 0000 -> row, row, col, col
+    let row = Number(card.id.slice(-4,-2));
+    let col = Number(card.id.slice(-2));
+    let index = row * game.cols + col;
+    return index;
 }
 
 function isFaceUp(card){
@@ -62,7 +105,7 @@ function turnFaceDown(card){
 function turnFaceUp(card){
     // ToDo: Front images
     let cardIndex = getCardIndex(card);
-    card.innerHTML = app.cardFronts[cardIndex];
+    card.innerHTML = game.cardFronts[cardIndex];
     game.cardFaceUp[cardIndex] = 1;
 }
 function toggleCard(card) {
@@ -83,7 +126,7 @@ function isMatch() {
     let card1 = game.selections[1];
     let card0Index = getCardIndex(card0);
     let card1Index = getCardIndex(card1);
-    return app.cardFronts[card0Index] === app.cardFronts[card1Index];
+    return game.cardFronts[card0Index] === game.cardFronts[card1Index];
 }
 function addClass(element, className) {
     if (element.classList)
@@ -100,18 +143,14 @@ else
 }
 
 function setGameWon(){
+    let popup = game.elements.popup;
     let message = "Congratulations! You won with " +
     game.turnCount + " moves in " +
-    game.elapsedSeconds + " seconds.";
-    game.elements.gameOver.innerHTML = message;
-    addClass(game.elements.gameOver, 'showing')
-    setTimeout(() => {
-        addClass(game.elements.gameOver, 'hidden');
-        removeClass(game.elements.gameOver, 'showing');
-    }, 2000);
-
+    game.elapsedSeconds + " seconds." + 
+    "<p>Play again?</p>";
+    popup.innerHTML = message;
+    popup.classList.toggle("show");
     stopTimer();
-    game.elements.gameControlButton.innerHTML = "New Game";
 }
 
 function resolveTurn(isCorrect) {
@@ -128,7 +167,7 @@ function resolveTurn(isCorrect) {
             setCardCompleted(card0);
             setCardCompleted(card1);
         }, shortPause);
-        if (completedCards === app.cards.length){
+        if (completedCards === game.cards.length){
             setGameWon();
         }
     } else {
@@ -159,24 +198,27 @@ function cardClickEventHandler() {
     } 
 };
 
-function gameControlClickHandler() {
-    console.log('button clicked');
-    console.log(this.innerHTML);
-    switch(this.innerHTML) {
-        case 'Start Game': case 'New Game':
-            initGame();
-            // this.addClass('hidden') 
-            break;
-        case 'Quit Game':
-            // restart
-            if (confirm('Are you sure you want to quit?')) {
-                initGame();
-                this.innerHTML = "New Game";
-            }
-            break;
-    }
+function popupClickHandler() {
+    initGame();
+    game.elements.popup.classList.toggle("show");
 }
 
+function setGameSize(size) {
+    game.gameSize = size;
+    game.rows = app.sizeValues[size].rows;
+    game.cols = app.sizeValues[size].cols;
+
+}
+function gameSizeChangeHandler(e){
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.currentTarget.value != game.gameSize) {
+        setGameSize(e.currentTarget.value);
+        initGame();
+    }
+
+  }
+  
 function setMoveCounter() {
     moveCounter.innerHTML = String(game.turnCount);
 }
@@ -195,13 +237,13 @@ function shuffleCards() {
     
     let emojiCount = emoji.length,
         cardFront = '',
-        m = app.cardFronts.length, 
+        m = game.rows * game.cols, 
         t, i;
 
     // Need at least two of each card.  Symbol pairs may repeat.
     for (i = 0; i < m; i += 2) {
         cardFront = Math.floor(Math.random() * emojiCount);
-        app.cardFronts[i] = app.cardFronts[i+1] = emoji[cardFront].char;
+        game.cardFronts[i] = game.cardFronts[i+1] = emoji[cardFront].char;
     }
     // Fisher-Yates shuffle.
     // While there remain elements to shuffle…
@@ -209,23 +251,35 @@ function shuffleCards() {
         // Pick a remaining element…
         i = Math.floor(Math.random() * m--);
         // And swap it with the current element.
-        t = app.cardFronts[m];
-        app.cardFronts[m] = app.cardFronts[i];
-        app.cardFronts[i] = t;
+        t = game.cardFronts[m];
+        game.cardFronts[m] = game.cardFronts[i];
+        game.cardFronts[i] = t;
     }      
 }
 
 function initGame() {
-    resetMoveCounter();
-    completedCards = 0;
-    for (card of app.cards) {
+    const cardCount = game.rows * game.cols;
+    addCards(game.rows, game.cols);
+    game.selections = [];
+    game.cardFronts = [];
+    game.cardFaceUp = [];
+    for (var i = 0; i < cardCount; i++) {
+        game.cardFronts.push('');
+        game.cardFaceUp.push(0);
+    }
+
+    game.cards = document.getElementsByClassName('card');
+    Array.from(game.cards).forEach(function(card) {
+        card.addEventListener('click', cardClickEventHandler);
+    });    
+
+    for (card of game.cards) {
         turnFaceDown(card);
     }
     shuffleCards();
     resetTimer();
-    Array.from(app.cards).forEach(function(card) {
-        card.addEventListener('click', cardClickEventHandler);
-    });    
+    resetMoveCounter();
+    completedCards = 0;
 }
 
 
@@ -636,15 +690,7 @@ emojiJSON = `[
         "name": "cowboy hat face",
         "keywords": "cowboy | cowgirl | face | hat"
     },
-    {
-        "no": 59,
-        "codes": "1F973",
-        "char": "🥳",
-        "name": "partying face",
-        "keywords": "celebration | hat | horn | party | partying face"
-    },
-    {
-        "no": 60,
+    {   "no": 60,
         "codes": "1F60E",
         "char": "😎",
         "name": "smiling face with sunglasses",
@@ -679,8 +725,11 @@ emojiJSON = `[
         "keywords": "face | worried"
     }
     ]`;
-    // --------set up game-----
+
+// --------set up game-----
 emoji = JSON.parse(emojiJSON);
-game.elements.gameControlButton.addEventListener('click', gameControlClickHandler);
+game.elements.popup.addEventListener('click', popupClickHandler);
+game.elements.gridSize.addEventListener('change', gameSizeChangeHandler);
+setGameSize(app.defaultGameSize);
 initGame();
 // -------------------------
